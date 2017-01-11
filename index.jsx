@@ -16,9 +16,7 @@ export default class Fit extends React.Component {
 
   componentDidMount () { window.addEventListener('resize', this.measure) }
 
-  componentWillUnmount () {
-    window.removeEventListener('resize', this.measure)
-  }
+  componentWillUnmount () { window.removeEventListener('resize', this.measure) }
 
   componentWillUpdate(nextProps, nextState) {
     if (nextProps.src !== this.props.src) {
@@ -40,9 +38,9 @@ export default class Fit extends React.Component {
     }
     if (shouldFit) {
       return align(this.state, fit(this.state, this.state.image))
-    } else {
-      return align(this.state, fill(this.state, this.state.image))
-    }
+    } 
+
+    return align(this.state, fill(this.state, this.state.image))
   }
 
   onLoad (e) {
