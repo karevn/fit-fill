@@ -1,7 +1,22 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import {align, fit, fill} from './src/calc'
+import {align, valign, halign, fit, fill} from './src/calc'
+
+function getImageStyle (container, size, opt) {
+  if (!(container.height && size)) {
+    return
+  }
+  const func = opt.fit ? fit : fill
+  size = func(container, size)
+  if (opt.valign) {
+    size = valign(container, size)
+  }
+  if (opt.halign) {
+    size = halign(container, size)
+  }
+  return size
+}
 
 export default class Fit extends React.Component {
   constructor (props) {
@@ -16,9 +31,7 @@ export default class Fit extends React.Component {
 
   componentDidMount () { window.addEventListener('resize', this.measure) }
 
-  componentWillUnmount () {
-    window.removeEventListener('resize', this.measure)
-  }
+  componentWillUnmount () { window.removeEventListener('resize', this.measure) }
 
   componentWillUpdate(nextProps, nextState) {
     if (nextProps.src !== this.props.src) {
@@ -32,17 +45,6 @@ export default class Fit extends React.Component {
       width: node.clientWidth,
       height: node.clientHeight
     })
-  }
-
-  getImageStyle (shouldFit) {
-    if (!(this.state.height && this.state.image)) {
-      return
-    }
-    if (shouldFit) {
-      return align(this.state, fit(this.state, this.state.image))
-    } else {
-      return align(this.state, fill(this.state, this.state.image))
-    }
   }
 
   onLoad (e) {
@@ -59,10 +61,11 @@ export default class Fit extends React.Component {
   }
 
   render () {
-    let {className, fit, component, ...props} = this.props
+    const state = this.state
+    const {className, fit, component, valign, halign, ...props} = this.props
     return (<div className={className}>
       {React.createElement(component, Object.assign({}, props, {
-        style: this.getImageStyle(fit),
+        style: getImageStyle(state, state.image, {fit, valign, halign}),
         onLoad: this.onLoad
       }))}
     </div>)
@@ -73,5 +76,7 @@ export default class Fit extends React.Component {
 Fit.defaultProps = {
   fit: false,
   className: 'fit',
-  component: 'img'
+  component: 'img',
+  valign: true,
+  halign: true
 }
