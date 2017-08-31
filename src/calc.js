@@ -1,10 +1,9 @@
 function aspect(thing) { return thing.width / thing.height }
-
+const prop = path => object => object[path]
 function resize(container, content, decision) {
   if (decision(aspect(container), aspect(content))) {
     return fitWidth(container, content)
   }
-  
   return fitHeight(container, content)
 }
 
@@ -30,12 +29,16 @@ function fitHeight(container, content) {
   }
 }
 
+function center(container, size, param, accessor) {
+  return Object.assign({}, size,
+    {[param]: (accessor(container) - accessor(size)) / 2})
+}
 export function valign(container, size) {
-  return Object.assign({}, size, {top: (container.height - size.height) / 2})
+  return center(container, size, 'top', prop('height'))
 }
 
 export function halign(container, size) {
-  return Object.assign({}, size, {left: (container.width - size.width) / 2})
+  return center(container, size, 'left', prop('width'))
 }
 
 export function align(container, size) {
@@ -45,7 +48,7 @@ export function align(container, size) {
   if (size.width > container.width) {
     return valign(container, size)
   }
-  
+
   return halign(container, size)
 }
 
